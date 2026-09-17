@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>KabOnTV - TV Par Kab Aayega?</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f7fb;
+      color: #171717;
+    }
+
+    header {
+      background: #111827;
+      color: white;
+      padding: 18px 5%;
+    }
+
+    .navbar {
+      max-width: 1200px;
+      margin: auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 27px;
+      font-weight: bold;
+    }
+
+    .tagline {
+      font-size: 13px;
+      color: #d1d5db;
+      margin-top: 4px;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 60px 20px 45px;
+      background: white;
+    }
+
+    .hero h1 {
+      font-size: clamp(30px, 5vw, 52px);
+      margin-bottom: 12px;
+    }
+
+    .hero p {
+      color: #666;
+      font-size: 17px;
+      margin-bottom: 28px;
+    }
+
+    .search-box {
+      max-width: 700px;
+      margin: auto;
+      display: flex;
+      gap: 10px;
+    }
+
+    .search-box input {
+      flex: 1;
+      padding: 16px 18px;
+      border: 2px solid #ddd;
+      border-radius: 12px;
+      font-size: 16px;
+      outline: none;
+    }
+
+    .search-box input:focus {
+      border-color: #111827;
+    }
+
+    .search-box button {
+      padding: 0 25px;
+      border: none;
+      border-radius: 12px;
+      background: #111827;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: auto;
+      padding: 40px 20px;
+    }
+
+    .section-title {
+      font-size: 25px;
+      margin-bottom: 20px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 22px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.07);
+    }
+
+    .card h3 {
+      font-size: 21px;
+      margin-bottom: 15px;
+    }
+
+    .info {
+      margin: 8px 0;
+      color: #555;
+    }
+
+    .channel {
+      font-weight: bold;
+      color: #111827;
+    }
+
+    .result-area {
+      display: none;
+      margin-top: 40px;
+    }
+
+    .no-result {
+      background: white;
+      padding: 25px;
+      border-radius: 15px;
+      text-align: center;
+      color: #666;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #eef2ff;
+      padding: 6px 10px;
+      border-radius: 20px;
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+
+    footer {
+      margin-top: 40px;
+      background: #111827;
+      color: white;
+      text-align: center;
+      padding: 25px;
+    }
+
+    @media (max-width: 800px) {
+      .cards {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .navbar {
+        display: block;
+        text-align: center;
+      }
+
+      .hero {
+        padding: 45px 15px 35px;
+      }
+
+      .search-box {
+        flex-direction: column;
+      }
+
+      .search-box button {
+        padding: 15px;
+      }
+
+      .cards {
+        grid-template-columns: 1fr;
+      }
+
+      .container {
+        padding: 30px 15px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="navbar">
+      <div>
+        <div class="logo">📺 KabOnTV</div>
+        <div class="tagline">TV Par Kab Aayega?</div>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <h1>Movie, Serial ya Cartoon Search Karo</h1>
+
+    <p>
+      Pata karo TV par kya, kab aur kis channel par aayega.
+    </p>
+
+    <div class="search-box">
+      <input
+        type="text"
+        id="searchInput"
+        placeholder="Example: Stree 2, Shinchan..."
+        onkeypress="handleEnter(event)"
+      >
+
+      <button onclick="searchShow()">Search</button>
+    </div>
+  </section>
+
+  <main class="container">
+
+    <div id="resultArea" class="result-area">
+      <h2 class="section-title">🔎 Search Results</h2>
+      <div id="results" class="cards"></div>
+    </div>
+
+    <h2 class="section-title">🔥 Popular on TV</h2>
+
+    <div class="cards">
+
+      <div class="card">
+        <span class="badge">Movie</span>
+        <h3>Stree 2</h3>
+        <div class="info">📺 <span class="channel">Sony Max</span></div>
+        <div class="info">📅 Tomorrow</div>
+        <div class="info">🕘 9:45 PM</div>
+      </div>
+
+      <div class="card">
+        <span class="badge">Cartoon</span>
+        <h3>Shinchan</h3>
+        <div class="info">📺 <span class="channel">Hungama</span></div>
+        <div class="info">📅 Today</div>
+        <div class="info">🕘 7:30 PM</div>
+      </div>
+
+      <div class="card">
+        <span class="badge">Cartoon</span>
+        <h3>Doraemon</h3>
+        <div class="info">📺 <span class="channel">Sony YAY!</span></div>
+        <div class="info">📅 Today</div>
+        <div class="info">🕘 8:00 PM</div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <footer>
+    <p>© 2026 KabOnTV • TV Schedule Information</p>
+  </footer>
+
+
+  <script>
+
+    const shows = [
+
+      {
+        name: "Stree 2",
+        type: "Movie",
+        channel: "Sony Max",
+        date: "Tomorrow",
+        time: "9:45 PM"
+      },
+
+      {
+        name: "Shinchan",
+        type: "Cartoon",
+        channel: "Hungama",
+        date: "Today",
+        time: "7:30 PM"
+      },
+
+      {
+        name: "Doraemon",
+        type: "Cartoon",
+        channel: "Sony YAY!",
+        date: "Today",
+        time: "8:00 PM"
+      }
+
+    ];
+
+
+    function searchShow() {
+
+      const input = document
+        .getElementById("searchInput")
+        .value
+        .toLowerCase()
+        .trim();
+
+      const resultArea = document.getElementById("resultArea");
+      const results = document.getElementById("results");
+
+      if (input === "") {
+        resultArea.style.display = "none";
+        return;
+      }
+
+      const matches = shows.filter(show =>
+        show.name.toLowerCase().includes(input)
+      );
+
+      resultArea.style.display = "block";
+
+      if (matches.length === 0) {
+
+        results.innerHTML = `
+          <div class="no-result">
+            😕 Is naam ka TV schedule abhi nahi mila.
+            <br><br>
+            Baad mein dobara search karo.
+          </div>
+        `;
+
+        return;
+      }
+
+      results.innerHTML = matches.map(show => `
+
+        <div class="card">
+
+          <span class="badge">${show.type}</span>
+
+          <h3>${show.name}</h3>
+
+          <div class="info">
+            📺 <span class="channel">${show.channel}</span>
+          </div>
+
+          <div class="info">
+            📅 ${show.date}
+          </div>
+
+          <div class="info">
+            🕘 ${show.time}
+          </div>
+
+        </div>
+
+      `).join("");
+
+    }
+
+
+    function handleEnter(event) {
+
+      if (event.key === "Enter") {
+        searchShow();
+      }
+
+    }
+
+  </script>
+
+</body>
+</html>
