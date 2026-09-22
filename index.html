@@ -368,205 +368,160 @@ footer{
 </footer>
 
 <script>
-
-function searchTV(){
-
-    let input =
-        document.getElementById("searchInput")
-        .value
-        .toLowerCase()
-        .trim();
-
-    let cards =
-        document.querySelectorAll(".card");
-
-    let found = false;
-
-    cards.forEach(function(card){
-
-        let name =
-            card.getAttribute("data-name");
-
-        if(input === "" || name.includes(input)){
-
-            card.style.display = "block";
-            found = true;
-
-        }else{
-
-            card.style.display = "none";
-
-        }
-
-    });
-
-    document.getElementById("noResult").style.display =
-        found ? "none" : "block";
-}
-
-document.getElementById("searchInput")
-.addEventListener("keypress", function(event){
-
-    if(event.key === "Enter"){
-        searchTV();
-    }
-
-});
-
-</script>
 <script>
-const searchInput = document.querySelector('input[type="search"], input[placeholder*="Search"], input');
+async function searchTV() {
 
-if (searchInput) {
+  const input = document.getElementById("searchInput");
+  const query = input.value.trim();
 
-  const resultsBox = document.createElement("div");
-  resultsBox.id = "liveResults";
+  const noResult = document.getElementById("noResult");
 
-  resultsBox.style.cssText = `
-    width: 100%;
-    max-width: 1100px;
-    margin: 30px auto;
-    padding: 0 16px;
-    box-sizing: border-box;
-  `;
+  if (!query) {
+    noResult.style.display = "block";
+    noResult.innerHTML = "🔎 Please search for a movie, serial or cartoon.";
+    return;
+  }
 
-  searchInput.closest("form")?.insertAdjacentElement(
-    "afterend",
-    resultsBox
-  );
+  // Create results box if it doesn't already exist
+  let resultsBox = document.getElementById("liveResults");
 
-  async function searchKabOnTV() {
+  if (!resultsBox) {
+    resultsBox = document.createElement("div");
+    resultsBox.id = "liveResults";
 
-    const query = searchInput.value.trim();
-
-    if (!query) return;
-
-    resultsBox.innerHTML = `
-      <div style="
-        text-align:center;
-        padding:25px;
-        color:white;
-      ">
-        🔎 Searching TV schedules...
-      </div>
+    resultsBox.style.cssText = `
+      width:100%;
+      max-width:1100px;
+      margin:25px auto;
+      padding:0 16px;
+      box-sizing:border-box;
     `;
 
-    resultsBox.scrollIntoView({
-      behavior: "smooth",
-      block: "start"
-    });
+    noResult.parentNode.insertBefore(resultsBox, noResult);
+  }
 
-    try {
+  resultsBox.innerHTML = `
+    <div style="
+      text-align:center;
+      padding:25px;
+      font-size:18px;
+    ">
+      🔎 Searching TV schedules...
+    </div>
+  `;
 
-      const response = await fetch(
-        "/schedule?q=" + encodeURIComponent(query)
-      );
+  noResult.style.display = "none";
 
-      const data = await response.json();
+  // Automatically move to results
+  resultsBox.scrollIntoView({
+    behavior:"smooth",
+    block:"start"
+  });
 
-      if (!data.success || !data.results.length) {
+  try {
 
-        resultsBox.innerHTML = `
-          <div style="
-            text-align:center;
-            padding:30px;
-            color:white;
-          ">
-            <h2>No schedule found</h2>
-            <p>Try another movie, serial or cartoon name.</p>
-          </div>
-        `;
+    const response = await fetch(
+      "/schedule?q=" + encodeURIComponent(query)
+    );
 
-        resultsBox.scrollIntoView({
-          behavior: "smooth",
-          block: "start"
-        });
+    const data = await response.json();
 
-        return;
-      }
-
-      resultsBox.innerHTML = `
-        <h2 style="
-          color:white;
-          margin-bottom:20px;
-        ">
-          📺 Results for "${query}"
-        </h2>
-      `;
-
-      data.results.forEach(item => {
-
-        const card = document.createElement("div");
-
-        card.style.cssText = `
-          background:rgba(255,255,255,0.08);
-          border:1px solid rgba(255,255,255,0.12);
-          border-radius:18px;
-          padding:20px;
-          margin-bottom:14px;
-          color:white;
-        `;
-
-        card.innerHTML = `
-          <h3 style="margin:0 0 12px;">
-            🎬 ${item.title}
-          </h3>
-
-          <div style="margin:6px 0;">
-            📺 <strong>Channel:</strong> ${item.channel}
-          </div>
-
-          <div style="margin:6px 0;">
-            🕐 <strong>Time:</strong> ${item.indiaTime}
-          </div>
-        `;
-
-        resultsBox.appendChild(card);
-      });
-
-      setTimeout(() => {
-        resultsBox.scrollIntoView({
-          behavior: "smooth",
-          block: "start"
-        });
-      }, 100);
-
-    } catch (error) {
+    if (
+      !data.success ||
+      !data.results ||
+      data.results.length === 0
+    ) {
 
       resultsBox.innerHTML = `
         <div style="
           text-align:center;
           padding:30px;
-          color:white;
         ">
-          ⚠️ Something went wrong. Please try again.
+          <h2>😕 Schedule Not Found</h2>
+          <p>No TV schedule found for "${query}".</p>
+          <p>Try another movie, serial or cartoon.</p>
         </div>
       `;
+
+      resultsBox.scrollIntoView({
+        behavior:"smooth",
+        block:"start"
+      });
+
+      return;
     }
-  }
 
-  const form = searchInput.closest("form");
+    resultsBox.innerHTML = `
+      <h2 style="margin-bottom:20px;">
+        📺 TV Schedule Results
+      </h2>
+    `;
 
-  if (form) {
+    data.results.forEach(item => {
 
-    form.addEventListener("submit", function(event) {
-      event.preventDefault();
-      searchKabOnTV();
+      const card = document.createElement("div");
+
+      card.style.cssText = `
+        background:rgba(255,255,255,0.08);
+        border:1px solid rgba(255,255,255,0.15);
+        border-radius:18px;
+        padding:20px;
+        margin-bottom:15px;
+      `;
+
+      card.innerHTML = `
+        <h3 style="margin:0 0 12px;">
+          🎬 ${item.title}
+        </h3>
+
+        <p style="margin:7px 0;">
+          📺 <strong>Channel:</strong> ${item.channel}
+        </p>
+
+        <p style="margin:7px 0;">
+          🕐 <strong>Time:</strong> ${item.indiaTime}
+        </p>
+      `;
+
+      resultsBox.appendChild(card);
     });
 
-  } else {
+    // Scroll again after results are loaded
+    setTimeout(() => {
+      resultsBox.scrollIntoView({
+        behavior:"smooth",
+        block:"start"
+      });
+    }, 150);
 
-    searchInput.addEventListener("keydown", function(event) {
+  } catch (error) {
 
-      if (event.key === "Enter") {
-        event.preventDefault();
-        searchKabOnTV();
-      }
+    resultsBox.innerHTML = `
+      <div style="
+        text-align:center;
+        padding:30px;
+      ">
+        ⚠️ Schedule load nahi ho paya.
+        Please try again.
+      </div>
+    `;
 
+    resultsBox.scrollIntoView({
+      behavior:"smooth",
+      block:"start"
     });
-
   }
 }
+
+
+// Enter key se search
+document.getElementById("searchInput")
+.addEventListener("keypress", function(event) {
+
+  if (event.key === "Enter") {
+    event.preventDefault();
+    searchTV();
+  }
+
+});
 </script>
-</body>
-  </html>
