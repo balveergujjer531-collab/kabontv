@@ -5,61 +5,45 @@ export async function onRequest(context) {
   if (!query) {
     return Response.json({
       success: false,
-      message: "Search something. Example: ?q=shinchan"
+      message: "Search something. Example: ?q=animal"
     });
   }
 
-  const epgUrl =
-    "https://iptv-org.github.io/epg/guides/in/dishtv.in.epg.xml";
+  const api =
+    "https://epg.pw/api/epg.json?channel_id=410431";
 
   try {
-    const response = await fetch(epgUrl);
+    const response = await fetch(api);
 
     if (!response.ok) {
-      throw new Error("EPG source unavailable");
+      throw new Error("EPG request failed");
     }
 
-    const xml = await response.text();
+    const data = await response.json();
 
-    const programs = [];
-    const blocks = xml.match(/<programme[\s\S]*?<\/programme>/g) || [];
-
-    for (const block of blocks) {
-      const titleMatch = block.match(/<title[^>]*>([\s\S]*?)<\/title>/);
-      const channelMatch = block.match(/channel="([^"]+)"/);
-      const startMatch = block.match(/start="([^"]+)"/);
-
-      if (!titleMatch || !startMatch) continue;
-
-      const title = titleMatch[1]
-        .replace(/<!\[CDATA\[|\]\]>/g, "")
-        .replace(/&amp;/g, "&")
-        .trim();
-
-      if (!title.toLowerCase().includes(query)) continue;
-
-      programs.push({
-        title,
-        channel: channelMatch ? channelMatch[1] : "Unknown",
-        start: startMatch[1]
-      });
-
-      if (programs.length >= 20) break;
-    }
+    const results = (data.epg_list || [])
+      .filter(program =>
+        program.title.toLowerCase().includes(query)
+      )
+      .map(program => ({
+        title: program.title.trim(),
+        channel: data.name,
+        start: program.start_date
+      }));
 
     return Response.json({
       success: true,
       query,
-      results: programs
+      results
     });
 
   } catch (error) {
     return Response.json(
       {
         success: false,
-        error: "TV schedule data could not be loaded."
+        error: "Schedule data could not be loaded."
       },
       { status: 500 }
     );
   }
-}
+        }
