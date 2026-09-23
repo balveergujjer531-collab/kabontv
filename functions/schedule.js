@@ -12,7 +12,65 @@ const CHANNELS = [
   { name: "DD Kashir", id: 543500 }
 ];
 
+async function getChannelResults(channel, query) {
+  try {
+    const controller = new AbortController();
+
+    const timeout = setTimeout(() => {
+      controller.abort();
+    }, 5000);
+
+    const response = await fetch(
+      `https://epg.pw/api/epg.json?channel_id=${channel.id}`,
+      {
+        signal: controller.signal
+      }
+    );
+
+    clearTimeout(timeout);
+
+    if (!response.ok) return [];
+
+    const data = await response.json();
+
+    return (data.epg_list || [])
+      .filter(program =>
+        String(program.title || "")
+          .toLowerCase()
+          .includes(query)
+      )
+      .map(program => {
+        const start = new Date(program.start_date);
+
+        return {
+          title: String(program.title || "").trim(),
+          channel: channel.name,
+
+          date: new Intl.DateTimeFormat("en-IN", {
+            timeZone: "Asia/Kolkata",
+            day: "2-digit",
+            month: "long",
+            year: "numeric"
+          }).format(start),
+
+          time: new Intl.DateTimeFormat("en-IN", {
+            timeZone: "Asia/Kolkata",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true
+          }).format(start),
+
+          start: program.start_date
+        };
+      });
+
+  } catch (error) {
+    return [];
+  }
+}
+
 export async function onRequest(context) {
+
   const url = new URL(context.request.url);
 
   const query = (url.searchParams.get("q") || "")
@@ -22,93 +80,42 @@ export async function onRequest(context) {
   if (!query) {
     return Response.json({
       success: false,
-      message: "Search something"
+      results: []
     });
   }
 
-  try {
-    const responses = await Promise.allSettled(
-      CHANNELS.map(async (channel) => {
+  const results = [];
 
-        const api =
-          `https://epg.pw/api/epg.json?channel_id=${channel.id}`;
+  // Search channels in small batches
+  for (let i = 0; i < CHANNELS.length; i += 3) {
 
-        const response = await fetch(api);
+    const batch = CHANNELS.slice(i, i + 3);
 
-        if (!response.ok) {
-          return [];
-        }
-
-        const data = await response.json();
-
-        return (data.epg_list || [])
-          .filter(program => {
-
-            const title = String(
-              program.title || ""
-            ).trim().toLowerCase();
-
-            return title.includes(query);
-          })
-          .map(program => {
-
-            const start = new Date(program.start_date);
-
-            const indiaDate =
-              new Intl.DateTimeFormat("en-IN", {
-                timeZone: "Asia/Kolkata",
-                day: "2-digit",
-                month: "long",
-                year: "numeric"
-              }).format(start);
-
-            const indiaTime =
-              new Intl.DateTimeFormat("en-IN", {
-                timeZone: "Asia/Kolkata",
-                hour: "2-digit",
-                minute: "2-digit",
-                hour12: true
-              }).format(start);
-
-            return {
-              title: String(program.title || "").trim(),
-              channel: channel.name,
-              date: indiaDate,
-              time: indiaTime,
-              start: program.start_date
-            };
-          });
-      })
+    const batchResults = await Promise.all(
+      batch.map(channel =>
+        getChannelResults(channel, query)
+      )
     );
 
-    let results = [];
-
-    for (const response of responses) {
-      if (response.status === "fulfilled") {
-        results.push(...response.value);
-      }
+    for (const items of batchResults) {
+      results.push(...items);
     }
 
-    results.sort(
-      (a, b) =>
-        new Date(a.start).getTime() -
-        new Date(b.start).getTime()
-    );
-
-    return Response.json({
-      success: true,
-      query: query,
-      results: results
-    });
-
-  } catch (error) {
-
-    return Response.json(
-      {
-        success: false,
-        error: "Schedule data could not be loaded."
-      },
-      { status: 500 }
-    );
+    // Stop early if we already found something
+    if (results.length > 0) {
+      break;
+    }
   }
+
+  results.sort(
+    (a, b) =>
+      new Date(a.start).getTime() -
+      new Date(b.start).getTime()
+  );
+
+  return Response.json({
+    success: true,
+    query,
+    results
+  });
 }
