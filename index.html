@@ -419,19 +419,42 @@ async function searchTV() {
 
   try {
 
+  const controller = new AbortController();
+
+const timeout = setTimeout(() => {
+  controller.abort();
+}, 15000);
+
+try {
+
   const response = await fetch(
-  "/schedule?q=" + encodeURIComponent(query) + "&_=" + Date.now(),
-  {
-    cache: "no-store"
+    "/schedule?q=" + encodeURIComponent(query) + "&_=" + Date.now(),
+    {
+      cache: "no-store",
+      signal: controller.signal
+    }
+  );
+
+  clearTimeout(timeout);
+
+  if (!response.ok) {
+    throw new Error("Schedule API error");
   }
-);
 
-if (!response.ok) {
-  throw new Error("Schedule API error");
-}
+  const data = await response.json();
 
-const data = await response.json();
+  console.log("KabOnTV API:", data);
 
+} catch (error) {
+
+  clearTimeout(timeout);
+
+  if (error.name === "AbortError") {
+    throw new Error("Schedule API took too long.");
+  }
+
+  throw error;
+      }
     if (
       !data.success ||
       !data.results ||
