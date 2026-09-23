@@ -2,32 +2,19 @@ const CHANNELS = [
   { name: "Sony MAX", id: 410431 },
   { name: "Sony TV", id: 410430 },
   { name: "Sony WAH", id: 543352 },
-  { name: "Sony SAB", id: 12120 },
-  { name: "Star Bharat", id: 410440 },
   { name: "Cartoon Network", id: 543449 },
-  { name: "Disney Channel", id: 543306 },
-  { name: "Disney Junior", id: 543307 },
-  { name: "Nick", id: 543293 },
-  { name: "Nick Jr", id: 543294 },
-  { name: "Pogo", id: 543292 },
-  { name: "Discovery Channel", id: 543205 },
-  { name: "Discovery Kids", id: 543206 },
-  { name: "Animal Planet", id: 543203 },
-  { name: "Colors", id: 410437 },
-  { name: "Colors Rishtey", id: 543236 },
-  { name: "DD National", id: 410441 },
-  { name: "DD News", id: 410442 },
-  { name: "AAJ TAK", id: 410443 },
   { name: "Movies Now", id: 543174 },
   { name: "MNX", id: 463999 },
   { name: "Star Movies Select", id: 543316 },
   { name: "Mega TV", id: 411728 },
   { name: "Sony Sports Ten 1", id: 543109 },
-  { name: "Sony Sports Ten 5", id: 543047 }
+  { name: "Sony Sports Ten 5", id: 543047 },
+  { name: "DD Kashir", id: 543500 }
 ];
 
 export async function onRequest(context) {
   const url = new URL(context.request.url);
+
   const query = (url.searchParams.get("q") || "")
     .trim()
     .toLowerCase();
@@ -48,9 +35,7 @@ export async function onRequest(context) {
 
         const response = await fetch(api);
 
-        if (!response.ok) {
-          return [];
-        }
+        if (!response.ok) return [];
 
         const data = await response.json();
 
@@ -65,9 +50,7 @@ export async function onRequest(context) {
           })
           .map(program => {
 
-            const start = new Date(
-              program.start_date
-            );
+            const start = new Date(program.start_date);
 
             const indiaTime =
               new Intl.DateTimeFormat("en-IN", {
@@ -81,14 +64,9 @@ export async function onRequest(context) {
               }).format(start);
 
             return {
-              title: String(
-                program.title || ""
-              ).trim(),
-
+              title: String(program.title || "").trim(),
               channel: channel.name,
-
               start: program.start_date,
-
               indiaTime: indiaTime
             };
           });
@@ -98,11 +76,9 @@ export async function onRequest(context) {
     let results = [];
 
     for (const response of responses) {
-
       if (response.status === "fulfilled") {
         results.push(...response.value);
       }
-
     }
 
     results.sort(
@@ -124,9 +100,7 @@ export async function onRequest(context) {
         success: false,
         error: "Schedule data could not be loaded."
       },
-      {
-        status: 500
-      }
+      { status: 500 }
     );
   }
-   }
+          }
