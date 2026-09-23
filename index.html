@@ -419,11 +419,18 @@ async function searchTV() {
 
   try {
 
-    const response = await fetch(
-      "/schedule?q=" + encodeURIComponent(query)
-    );
+  const response = await fetch(
+  "/schedule?q=" + encodeURIComponent(query) + "&_=" + Date.now(),
+  {
+    cache: "no-store"
+  }
+);
 
-    const data = await response.json();
+if (!response.ok) {
+  throw new Error("Schedule API error");
+}
+
+const data = await response.json();
 
     if (
       !data.success ||
@@ -478,8 +485,9 @@ async function searchTV() {
         </p>
 
         <p style="margin:7px 0;">
-          🕐 <strong>Time:</strong> ${item.indiaTime}
-        </p>
+          
+        </<strong>Date:</strong> ${item.date}<br>
+<strong>Time:</strong> ${item.time}p>
       `;
 
       resultsBox.appendChild(card);
