@@ -35,7 +35,9 @@ export async function onRequest(context) {
 
         const response = await fetch(api);
 
-        if (!response.ok) return [];
+        if (!response.ok) {
+          return [];
+        }
 
         const data = await response.json();
 
@@ -44,7 +46,7 @@ export async function onRequest(context) {
 
             const title = String(
               program.title || ""
-            ).toLowerCase();
+            ).trim().toLowerCase();
 
             return title.includes(query);
           })
@@ -52,12 +54,17 @@ export async function onRequest(context) {
 
             const start = new Date(program.start_date);
 
-            const indiaTime =
+            const indiaDate =
               new Intl.DateTimeFormat("en-IN", {
                 timeZone: "Asia/Kolkata",
                 day: "2-digit",
-                month: "short",
-                year: "numeric",
+                month: "long",
+                year: "numeric"
+              }).format(start);
+
+            const indiaTime =
+              new Intl.DateTimeFormat("en-IN", {
+                timeZone: "Asia/Kolkata",
                 hour: "2-digit",
                 minute: "2-digit",
                 hour12: true
@@ -66,8 +73,9 @@ export async function onRequest(context) {
             return {
               title: String(program.title || "").trim(),
               channel: channel.name,
-              start: program.start_date,
-              indiaTime: indiaTime
+              date: indiaDate,
+              time: indiaTime,
+              start: program.start_date
             };
           });
       })
@@ -103,4 +111,4 @@ export async function onRequest(context) {
       { status: 500 }
     );
   }
-          }
+}
