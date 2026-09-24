@@ -377,22 +377,22 @@ async function searchTV() {
 
   if (!query) {
     noResult.style.display = "block";
-    noResult.innerHTML = "🔎 Please search for a movie, serial or cartoon.";
+    noResult.innerHTML =
+      "🔎 Please search for a movie, serial or cartoon.";
     return;
   }
 
-  // Create results box if it doesn't already exist
   let resultsBox = document.getElementById("liveResults");
 
   if (!resultsBox) {
+
     resultsBox = document.createElement("div");
     resultsBox.id = "liveResults";
 
     resultsBox.style.cssText = `
-      width:100%;
+      width:88%;
       max-width:1100px;
-      margin:25px auto;
-      padding:0 16px;
+      margin:30px auto;
       box-sizing:border-box;
     `;
 
@@ -411,7 +411,6 @@ async function searchTV() {
 
   noResult.style.display = "none";
 
-  // Automatically move to results
   resultsBox.scrollIntoView({
     behavior:"smooth",
     block:"start"
@@ -419,45 +418,26 @@ async function searchTV() {
 
   try {
 
-  const controller = new AbortController();
-
-const timeout = setTimeout(() => {
-  controller.abort();
-}, 15000);
-
-try {
-
-  const response = await fetch(
-    "/schedule?q=" + encodeURIComponent(query) + "&_=" + Date.now(),
-    {
-      cache: "no-store",
-      signal: controller.signal
-    }
-  );
-
-  clearTimeout(timeout);
-
-  if (!response.ok) {
-    throw new Error("Schedule API error");
-  }
-
-  const data = await response.json();
-
-  console.log("KabOnTV API:", data);
-
-} catch (error) {
-
-  clearTimeout(timeout);
-
-  if (error.name === "AbortError") {
-    throw new Error("Schedule API took too long.");
-  }
-
-  throw error;
+    const response = await fetch(
+      "/schedule?q=" +
+      encodeURIComponent(query) +
+      "&_=" + Date.now(),
+      {
+        cache:"no-store"
       }
+    );
+
+    if (!response.ok) {
+      throw new Error("API error");
+    }
+
+    const data = await response.json();
+
+    console.log("KabOnTV API:", data);
+
     if (
       !data.success ||
-      !data.results ||
+      !Array.isArray(data.results) ||
       data.results.length === 0
     ) {
 
@@ -465,17 +445,18 @@ try {
         <div style="
           text-align:center;
           padding:30px;
+          background:#0d1b2c;
+          border-radius:18px;
         ">
           <h2>😕 Schedule Not Found</h2>
-          <p>No TV schedule found for "${query}".</p>
-          <p>Try another movie, serial or cartoon.</p>
+          <p style="margin-top:10px;">
+            No TV schedule found for "${query}".
+          </p>
+          <p style="margin-top:8px;color:#9eacc0;">
+            Try another movie, serial or cartoon.
+          </p>
         </div>
       `;
-
-      resultsBox.scrollIntoView({
-        behavior:"smooth",
-        block:"start"
-      });
 
       return;
     }
@@ -491,32 +472,34 @@ try {
       const card = document.createElement("div");
 
       card.style.cssText = `
-        background:rgba(255,255,255,0.08);
-        border:1px solid rgba(255,255,255,0.15);
+        background:#0d1b2c;
+        border:1px solid #1d3047;
         border-radius:18px;
         padding:20px;
         margin-bottom:15px;
       `;
 
       card.innerHTML = `
-        <h3 style="margin:0 0 12px;">
+        <h3 style="margin:0 0 15px;font-size:21px;">
           🎬 ${item.title}
         </h3>
 
-        <p style="margin:7px 0;">
+        <p style="margin:8px 0;">
           📺 <strong>Channel:</strong> ${item.channel}
         </p>
 
-        <p style="margin:7px 0;">
-          
-        </<strong>Date:</strong> ${item.date}<br>
-<strong>Time:</strong> ${item.time}p>
+        <p style="margin:8px 0;">
+          📅 <strong>Date:</strong> ${item.date}
+        </p>
+
+        <p style="margin:8px 0;">
+          🕐 <strong>Time:</strong> ${item.time}
+        </p>
       `;
 
       resultsBox.appendChild(card);
     });
 
-    // Scroll again after results are loaded
     setTimeout(() => {
       resultsBox.scrollIntoView({
         behavior:"smooth",
@@ -526,34 +509,35 @@ try {
 
   } catch (error) {
 
+    console.error("KabOnTV error:", error);
+
     resultsBox.innerHTML = `
       <div style="
         text-align:center;
         padding:30px;
+        background:#0d1b2c;
+        border-radius:18px;
       ">
         ⚠️ Schedule load nahi ho paya.
+        <br><br>
         Please try again.
       </div>
     `;
-
-    resultsBox.scrollIntoView({
-      behavior:"smooth",
-      block:"start"
-    });
   }
 }
 
 
 // Enter key se search
-document.getElementById("searchInput")
-.addEventListener("keypress", function(event) {
+document
+  .getElementById("searchInput")
+  .addEventListener("keypress", function(event) {
 
-  if (event.key === "Enter") {
-    event.preventDefault();
-    searchTV();
-  }
+    if (event.key === "Enter") {
+      event.preventDefault();
+      searchTV();
+    }
 
-});
-</script>
+  });
+</script>  
 </body>
 </html>
