@@ -5,29 +5,14 @@ const CHANNELS = [
   { name: "Cartoon Network", id: 543449 },
   { name: "Movies Now", id: 543174 },
   { name: "MNX", id: 463999 },
-  { name: "Star Movies Select", id: 543316 },
-  { name: "Mega TV", id: 411728 },
-  { name: "Sony Sports Ten 1", id: 543109 },
-  { name: "Sony Sports Ten 5", id: 543047 },
-  { name: "DD Kashir", id: 543500 }
+  { name: "Star Movies Select", id: 543316 }
 ];
 
 async function getChannelResults(channel, query) {
   try {
-    const controller = new AbortController();
-
-    const timeout = setTimeout(() => {
-      controller.abort();
-    }, 5000);
-
     const response = await fetch(
-      `https://epg.pw/api/epg.json?channel_id=${channel.id}`,
-      {
-        signal: controller.signal
-      }
+      `https://epg.pw/api/epg.json?channel_id=${channel.id}&date=20260924`
     );
-
-    clearTimeout(timeout);
 
     if (!response.ok) return [];
 
@@ -40,6 +25,7 @@ async function getChannelResults(channel, query) {
           .includes(query)
       )
       .map(program => {
+
         const start = new Date(program.start_date);
 
         return {
@@ -86,25 +72,11 @@ export async function onRequest(context) {
 
   const results = [];
 
-  // Search channels in small batches
-  for (let i = 0; i < CHANNELS.length; i += 3) {
+  for (const channel of CHANNELS) {
 
-    const batch = CHANNELS.slice(i, i + 3);
+    const items = await getChannelResults(channel, query);
 
-    const batchResults = await Promise.all(
-      batch.map(channel =>
-        getChannelResults(channel, query)
-      )
-    );
-
-    for (const items of batchResults) {
-      results.push(...items);
-    }
-
-    // Stop early if we already found something
-    if (results.length > 0) {
-      break;
-    }
+    results.push(...items);
   }
 
   results.sort(
