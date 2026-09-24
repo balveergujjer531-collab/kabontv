@@ -1,445 +1,59 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>KabOnTV - TV Par Kab Aayega?</title>
-
-<style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Arial, sans-serif;
-}
-
-body{
-    background:#07111f;
-    color:white;
-}
-
-header{
-    padding:18px 6%;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    border-bottom:1px solid #1b2a3d;
-    background:#091625;
-}
-
-.logo{
-    font-size:26px;
-    font-weight:bold;
-}
-
-.logo span{
-    color:#ff3d71;
-}
-
-.nav{
-    color:#aebbd0;
-    font-size:14px;
-}
-
-.hero{
-    text-align:center;
-    padding:70px 20px 55px;
-    background:
-    radial-gradient(circle at top,#17345a 0,#07111f 55%);
-}
-
-.badge{
-    display:inline-block;
-    background:#13243a;
-    color:#ff5d88;
-    padding:8px 15px;
-    border-radius:30px;
-    font-size:13px;
-    margin-bottom:20px;
-}
-
-.hero h1{
-    font-size:48px;
-    line-height:1.1;
-    margin-bottom:18px;
-}
-
-.hero h1 span{
-    color:#ff3d71;
-}
-
-.hero p{
-    color:#9eacc0;
-    font-size:17px;
-    margin-bottom:30px;
-}
-
-.search-box{
-    max-width:700px;
-    margin:auto;
-    display:flex;
-    background:white;
-    padding:7px;
-    border-radius:15px;
-}
-
-.search-box input{
-    flex:1;
-    border:none;
-    outline:none;
-    padding:16px;
-    font-size:16px;
-    border-radius:10px;
-}
-
-.search-box button{
-    border:none;
-    background:#ff3d71;
-    color:white;
-    padding:0 25px;
-    border-radius:11px;
-    font-size:16px;
-    font-weight:bold;
-    cursor:pointer;
-}
-
-.container{
-    width:88%;
-    max-width:1100px;
-    margin:40px auto;
-}
-
-.section-title{
-    font-size:24px;
-    margin-bottom:20px;
-}
-
-.categories{
-    display:flex;
-    gap:12px;
-    flex-wrap:wrap;
-    margin-bottom:35px;
-}
-
-.category{
-    background:#101f32;
-    border:1px solid #20344c;
-    padding:11px 18px;
-    border-radius:30px;
-    color:#c7d2e0;
-}
-
-.results{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-    gap:18px;
-}
-
-.card{
-    background:#0d1b2c;
-    border:1px solid #1d3047;
-    border-radius:18px;
-    padding:22px;
-}
-
-.card-top{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:18px;
-}
-
-.card h3{
-    font-size:21px;
-}
-
-.type{
-    background:#182c44;
-    color:#9eb5cf;
-    padding:6px 10px;
-    border-radius:8px;
-    font-size:12px;
-}
-
-.info{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:12px;
-}
-
-.info-box{
-    background:#091625;
-    padding:14px;
-    border-radius:12px;
-}
-
-.label{
-    color:#71849b;
-    font-size:12px;
-    margin-bottom:5px;
-}
-
-.value{
-    font-weight:bold;
-}
-
-.no-result{
-    display:none;
-    text-align:center;
-    padding:35px;
-    background:#0d1b2c;
-    border-radius:15px;
-    color:#9eacc0;
-}
-
-footer{
-    text-align:center;
-    padding:35px 20px;
-    margin-top:60px;
-    border-top:1px solid #1b2a3d;
-    color:#71849b;
-    font-size:14px;
-}
-
-@media(max-width:600px){
-    header{
-        padding:16px 5%;
-    }
-
-    .logo{
-        font-size:22px;
-    }
-
-    .nav{
-        display:none;
-    }
-
-    .hero{
-        padding:50px 15px 40px;
-    }
-
-    .hero h1{
-        font-size:34px;
-    }
-
-    .hero p{
-        font-size:15px;
-    }
-
-    .search-box{
-        flex-direction:column;
-        background:transparent;
-        gap:10px;
-    }
-
-    .search-box input{
-        width:100%;
-    }
-
-    .search-box button{
-        height:52px;
-    }
-
-    .container{
-        width:90%;
-    }
-}
-</style>
-</head>
-
-<body>
-
-<header>
-    <div class="logo">📺 KabOn<span>TV</span></div>
-    <div class="nav">TV Schedule • Movies • Serials • Cartoons</div>
-</header>
-
-<section class="hero">
-
-    <div class="badge">📡 TV Schedule Finder</div>
-
-    <h1>TV Par <span>Kab</span> Aayega?</h1>
-
-    <p>Movie, Serial ya Cartoon search karo aur pata karo<br>
-    TV par kya, kab aur kis channel par aayega.</p>
-
-    <div class="search-box">
-        <input
-            type="text"
-            id="searchInput"
-            placeholder="Search movie, serial or cartoon..."
-        >
-
-        <button onclick="searchTV()">Search 🔍</button>
-    </div>
-
-</section>
-
-<div class="container">
-
-    <h2 class="section-title">🔥 Popular on TV</h2>
-
-    <div class="categories">
-        <div class="category">🎬 Movies</div>
-        <div class="category">📺 Serials</div>
-        <div class="category">🧒 Cartoons</div>
-        <div class="category">⭐ Popular</div>
-    </div>
-
-    <div class="results" id="results">
-
-        <div class="card" data-name="stree 2">
-
-            <div class="card-top">
-                <h3>Stree 2</h3>
-                <div class="type">Movie</div>
-            </div>
-
-            <div class="info">
-
-                <div class="info-box">
-                    <div class="label">CHANNEL</div>
-                    <div class="value">Sony Max</div>
-                </div>
-
-                <div class="info-box">
-                    <div class="label">DATE</div>
-                    <div class="value">Tomorrow</div>
-                </div>
-
-                <div class="info-box">
-                    <div class="label">TIME</div>
-                    <div class="value">9:45 PM</div>
-                </div>
-
-                <div class="info-box">
-                    <div class="label">STATUS</div>
-                    <div class="value">📅 Scheduled</div>
-                </div>
-
-            </div>
-
-        </div>
-
-        <div class="card" data-name="shinchan">
-
-            <div class="card-top">
-                <h3>Shinchan</h3>
-                <div class="type">Cartoon</div>
-            </div>
-
-            <div class="info">
-
-                <div class="info-box">
-                    <div class="label">CHANNEL</div>
-                    <div class="value">Hungama</div>
-                </div>
-
-                <div class="info-box">
-                    <div class="label">DATE</div>
-                    <div class="value">Today</div>
-                </div>
-
-                <div class="info-box">
-                    <div class="label">TIME</div>
-                    <div class="value">7:30 PM</div>
-                </div>
-
-                <div class="info-box">
-                    <div class="label">STATUS</div>
-                    <div class="value">📺 Scheduled</div>
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <div class="no-result" id="noResult">
-        😕 Is naam ka TV schedule abhi nahi mila.
-    </div>
-
-</div>
-
-<footer>
-    © 2026 KabOnTV • TV Schedule Finder
-</footer>
-
 <script>
 async function searchTV() {
 
-  const input = document.getElementById("searchInput");
-  const query = input.value.trim();
-
+  const query = document.getElementById("searchInput").value.trim();
   const noResult = document.getElementById("noResult");
 
   if (!query) {
     noResult.style.display = "block";
-    noResult.innerHTML =
-      "🔎 Please search for a movie, serial or cartoon.";
+    noResult.innerHTML = "🔎 Please search for a movie, serial or cartoon.";
     return;
   }
 
   let resultsBox = document.getElementById("liveResults");
 
   if (!resultsBox) {
-
     resultsBox = document.createElement("div");
     resultsBox.id = "liveResults";
-
-    resultsBox.style.cssText = `
-      width:88%;
-      max-width:1100px;
-      margin:30px auto;
-      box-sizing:border-box;
-    `;
-
+    resultsBox.style.cssText =
+      "width:88%;max-width:1100px;margin:30px auto;box-sizing:border-box;";
     noResult.parentNode.insertBefore(resultsBox, noResult);
   }
 
+  noResult.style.display = "none";
+
   resultsBox.innerHTML = `
-    <div style="
-      text-align:center;
-      padding:25px;
-      font-size:18px;
-    ">
+    <div style="text-align:center;padding:25px;font-size:18px;">
       🔎 Searching TV schedules...
     </div>
   `;
 
-  noResult.style.display = "none";
-
   resultsBox.scrollIntoView({
-    behavior:"smooth",
-    block:"start"
+    behavior: "smooth",
+    block: "start"
   });
 
   try {
 
     const response = await fetch(
-      "/schedule?q=" +
-      encodeURIComponent(query) +
-      "&_=" + Date.now(),
+      "/schedule?q=" + encodeURIComponent(query) + "&t=" + Date.now(),
       {
-        cache:"no-store"
+        method: "GET",
+        cache: "no-store"
       }
     );
 
+    const text = await response.text();
+
+    console.log("KabOnTV response:", text);
+
     if (!response.ok) {
-      throw new Error("API error");
+      throw new Error("API error " + response.status);
     }
 
-    const data = await response.json();
+    const data = JSON.parse(text);
 
-    console.log("KabOnTV API:", data);
-
-    if (
-      !data.success ||
-      !Array.isArray(data.results) ||
-      data.results.length === 0
-    ) {
+    if (!data.results || data.results.length === 0) {
 
       resultsBox.innerHTML = `
         <div style="
@@ -449,12 +63,7 @@ async function searchTV() {
           border-radius:18px;
         ">
           <h2>😕 Schedule Not Found</h2>
-          <p style="margin-top:10px;">
-            No TV schedule found for "${query}".
-          </p>
-          <p style="margin-top:8px;color:#9eacc0;">
-            Try another movie, serial or cartoon.
-          </p>
+          <p>No TV schedule found for "${query}".</p>
         </div>
       `;
 
@@ -484,28 +93,18 @@ async function searchTV() {
           🎬 ${item.title}
         </h3>
 
-        <p style="margin:8px 0;">
-          📺 <strong>Channel:</strong> ${item.channel}
-        </p>
-
-        <p style="margin:8px 0;">
-          📅 <strong>Date:</strong> ${item.date}
-        </p>
-
-        <p style="margin:8px 0;">
-          🕐 <strong>Time:</strong> ${item.time}
-        </p>
+        <p>📺 <strong>Channel:</strong> ${item.channel}</p>
+        <p>📅 <strong>Date:</strong> ${item.date}</p>
+        <p>🕐 <strong>Time:</strong> ${item.time}</p>
       `;
 
       resultsBox.appendChild(card);
     });
 
-    setTimeout(() => {
-      resultsBox.scrollIntoView({
-        behavior:"smooth",
-        block:"start"
-      });
-    }, 150);
+    resultsBox.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
 
   } catch (error) {
 
@@ -520,24 +119,19 @@ async function searchTV() {
       ">
         ⚠️ Schedule load nahi ho paya.
         <br><br>
-        Please try again.
+        ${error.message}
       </div>
     `;
   }
 }
 
-
-// Enter key se search
-document
-  .getElementById("searchInput")
-  .addEventListener("keypress", function(event) {
-
+document.getElementById("searchInput").addEventListener(
+  "keypress",
+  function(event) {
     if (event.key === "Enter") {
       event.preventDefault();
       searchTV();
     }
-
-  });
-</script>  
-</body>
-</html>
+  }
+);
+</script>
