@@ -367,5 +367,153 @@ footer{
 <footer>
     © 2026 KabOnTV • TV Schedule Finder
 </footer>  
+</footer>
+
+<script>
+async function searchTV() {
+
+  const query = document.getElementById("searchInput").value.trim();
+  const noResult = document.getElementById("noResult");
+
+  if (!query) {
+    noResult.style.display = "block";
+    noResult.innerHTML =
+      "🔎 Please search for a movie, serial or cartoon.";
+    return;
+  }
+
+  let resultsBox = document.getElementById("liveResults");
+
+  if (!resultsBox) {
+    resultsBox = document.createElement("div");
+    resultsBox.id = "liveResults";
+
+    resultsBox.style.cssText =
+      "width:88%;max-width:1100px;margin:30px auto;box-sizing:border-box;";
+
+    noResult.parentNode.insertBefore(resultsBox, noResult);
+  }
+
+  noResult.style.display = "none";
+
+  resultsBox.innerHTML = `
+    <div style="text-align:center;padding:25px;font-size:18px;">
+      🔎 Searching TV schedules...
+    </div>
+  `;
+
+  try {
+
+    const response = await fetch(
+      "/schedule?q=" +
+      encodeURIComponent(query) +
+      "&t=" + Date.now(),
+      {
+        method: "GET",
+        cache: "no-store"
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("API error " + response.status);
+    }
+
+    const data = await response.json();
+
+    console.log("KabOnTV:", data);
+
+    if (
+      !data.success ||
+      !Array.isArray(data.results) ||
+      data.results.length === 0
+    ) {
+
+      resultsBox.innerHTML = `
+        <div style="
+          text-align:center;
+          padding:30px;
+          background:#0d1b2c;
+          border-radius:18px;
+        ">
+          <h2>😕 Schedule Not Found</h2>
+          <p>No TV schedule found for "${query}".</p>
+        </div>
+      `;
+
+      return;
+    }
+
+    resultsBox.innerHTML = `
+      <h2 style="margin-bottom:20px;">
+        📺 TV Schedule Results
+      </h2>
+    `;
+
+    data.results.forEach(item => {
+
+      const card = document.createElement("div");
+
+      card.style.cssText = `
+        background:#0d1b2c;
+        border:1px solid #1d3047;
+        border-radius:18px;
+        padding:20px;
+        margin-bottom:15px;
+      `;
+
+      card.innerHTML = `
+        <h3 style="margin:0 0 15px;font-size:21px;">
+          🎬 ${item.title}
+        </h3>
+
+        <p style="margin:8px 0;">
+          📺 <strong>Channel:</strong> ${item.channel}
+        </p>
+
+        <p style="margin:8px 0;">
+          📅 <strong>Date:</strong> ${item.date}
+        </p>
+
+        <p style="margin:8px 0;">
+          🕐 <strong>Time:</strong> ${item.time}
+        </p>
+      `;
+
+      resultsBox.appendChild(card);
+    });
+
+  } catch (error) {
+
+    console.error("KabOnTV error:", error);
+
+    resultsBox.innerHTML = `
+      <div style="
+        text-align:center;
+        padding:30px;
+        background:#0d1b2c;
+        border-radius:18px;
+      ">
+        ⚠️ Schedule load nahi ho paya.
+        <br><br>
+        Please try again.
+      </div>
+    `;
+  }
+}
+
+document
+  .getElementById("searchInput")
+  .addEventListener("keypress", function(event) {
+
+    if (event.key === "Enter") {
+      event.preventDefault();
+      searchTV();
+    }
+
+  });
+</script>
+
+</body>
+</html>
 </body>
                   </html>
