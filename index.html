@@ -448,7 +448,10 @@ async function searchTV() {
         📺 TV Schedule Results
       </h2>
     `;
-
+resultsBox.scrollIntoView({
+  behavior: "smooth",
+  block: "start"
+});
     data.results.forEach(item => {
 
       const card = document.createElement("div");
