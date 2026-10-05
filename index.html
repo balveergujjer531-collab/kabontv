@@ -419,7 +419,15 @@ async function searchTV() {
     }
 
     const data = await response.json();
+    const now = new Date();
 
+data.results = data.results.filter(item => {
+  const dateTime = new Date(
+    `${item.date} ${item.time}`
+  );
+
+  return dateTime >= now;
+});
     console.log("KabOnTV:", data);
 
     if (
