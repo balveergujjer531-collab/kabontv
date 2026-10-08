@@ -447,10 +447,7 @@ async function searchTV() {
         📺 TV Schedule Results
       </h2>
     `;
-resultsBox.scrollIntoView({
-  behavior: "smooth",
-  block: "start"
-});
+
     data.results.forEach(item => {
 
       const card = document.createElement("div");
@@ -483,7 +480,12 @@ resultsBox.scrollIntoView({
 
       resultsBox.appendChild(card);
     });
-
+setTimeout(() => {
+  resultsBox.scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+}, 100);
   } catch (error) {
 
     console.error("KabOnTV error:", error);
